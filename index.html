@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch and send data to server</title>
+    <style>
+        button,
+        input {
+            box-sizing: border-box;
+            width: 20%;
+            padding: 10px;
+        }
+
+        div {
+            font-size: 400px;
+            text-align: center;
+            width: 77%;
+            height: 55.7%;
+            position: absolute;
+            top: 8px;
+            left: 21%;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="addFetchNoJSON">Add 1 with fetch api without JSON</button><br>
+    <button id="subtractFetchJSON">Subtract 1 with fetch api with JSON</button><br>
+    <button id="subtractFetchAsyncAwait">Subtract 1 with fetch/api with async/await</button><br>
+    <button id="subtractjquery-post">Subtract 1 with jquery $.post</button><br>
+    <button id="subtractjquery-ajax">Subtract 1 with jquery $.ajax</button><br>
+    <button id="subtractaxious-then">Subtract 1 with axious then</button><br>
+    <button id="subtractaxious-AsyncAwait">Subtract 1 with axious async/await</button><br>
+    <button id="getImage" onclick="getImageFromServer()">Get Image</button><br>
+    <button id="pdfButton">PDF</button><br>
+    <input title="onInput" type="range" id="oninput" onInput="output.value=this.value"><br>
+    <output id="output"></output><br>
+    <button id="getbtn">GET</button>
+    <br><br>
+    <label>Forms</label>
+    <form id="postform" method="post" action="add.php">
+        <input type="text" id="postname" name="name" placeholder="Enter your name"><br>
+        <input type="text" id="postage" name="age" placeholder="Enter your age"><br>
+        <input type="submit" id="postsubmit" name="postsubmit" value="POST">
+    </form>
+    <p id="postresponse"></p>
+    <form id="getform" method="get" action="add.php">
+        <input type="text" id="getname" name="name" placeholder="Enter your name"><br>
+        <input type="text" id="getage" name="age" placeholder="Enter your age"><br>
+        <input type="submit" id="getsubmit" value="GET">
+    </form>
+    <p id="getresponse"></p>
+
+    <div title="result" id="result"></div>
+
+    <img id="myImage" src="" alt="">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+
+        document.getElementById("result").innerHTML = 0;
+
+        //Add 1 with fetch api without JSON
+        document.getElementById("addFetchNoJSON").addEventListener("click", function () {
+            let res = document.getElementById("result").innerHTML;
+            fetch("add.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                },
+                body: `res=${res}`,
+            })
+                .then((response) => response.text())
+                .then(res => {
+                    console.log('Success:', res);
+                    document.getElementById("result").innerHTML = res;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        })
+
+        //Subtract 1 with fetch api with JSON
+        document.getElementById("subtractFetchJSON").addEventListener("click", function () {
+            let res = document.getElementById("result").innerHTML;
+
+            const data = {
+                res: res,
+            };
+
+            fetch('add.php', {
+                method: 'POST', // or 'PUT'
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Something went wrong');
+                    }
+                    return response.json()
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    document.getElementById("result").innerHTML = data
+
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+
+        })
+
+
+        //Subtract 1 with fetch / api with async / await
+        document.getElementById("subtractFetchAsyncAwait").addEventListener("click", async function () {
+            let res = document.getElementById("result").innerHTML;
+
+            const data = {
+                res: res
+            };
+
+            try {
+                const response = await fetch('add.php', {
+                    method: 'POST', // or 'PUT'
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+                const dataFromServer = await response.json()
+
+                if (!response.ok) {
+                    throw new Error('Something went wrong');
+                }
+
+                console.log('Success:', dataFromServer);
+                document.getElementById("result").innerHTML = dataFromServer
+            } catch (error) {
+                console.error('Error:', error);
+            }
+
+
+        })
+
+        //Subtract 1 with jquery $.post
+        $("#subtractjquery-post").click(function () {
+            res = $("#result").html();
+            const data = {
+                res: res
+            };
+            $.post("add.php", JSON.stringify(data),
+                function (data, status) {
+                    $("#result").html(data);
+                    console.log("Data: " + data + "\nStatus: " + status);
+                })
+                .done(function (msg) {
+                    console.log("second success" + msg);
+                })
+                .fail(function (xhr, status, error) {
+                    console.log("Error: " + error);
+                })
+        });
+
+        //Subtract 1 with jquery $.ajax
+        $("#subtractjquery-ajax").click(function () {
+            res = $("#result").html();
+            const data = {
+                res: res
+            };
+            $.ajax({
+                type: "POST",
+                url: "add.php",
+                data: JSON.stringify(data),
+                success: function (msg) {
+                    $("#result").html(msg);
+                    console.log("Data Saved: " + msg);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("some error " + errorThrown);
+                }
+            });
+        });
+
+        //Subtract 1 with axious then
+        document.getElementById("subtractaxious-then").addEventListener("click", function () {
+            let res = document.getElementById("result").innerHTML;
+            const data = {
+                res: res
+            };
+            axios.post('add.php', JSON.stringify(data))
+                .then(function (response) {
+                    console.log(response);
+                    document.getElementById("result").innerHTML = response.data
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        })
+
+
+        //Subtract 1 with axious async / await
+        document.getElementById("subtractaxious-AsyncAwait").addEventListener("click", async function () {
+            let res = document.getElementById("result").innerHTML;
+            const data = {
+                res: res
+            };
+
+            try {
+                const response = await axios.post('add.php', JSON.stringify(data));
+                console.log(response);
+                document.getElementById("result").innerHTML = response.data
+            } catch (error) {
+                console.error(error);
+            }
+
+        })
+
+        function getImageFromServer() {
+            myImage = document.getElementById("myImage");
+            const myHeaders = new Headers();
+
+            const myRequest = new Request('flowers.jpg', {
+                method: 'GET',
+                headers: myHeaders,
+                mode: 'cors',
+                cache: 'default',
+            });
+
+            fetch(myRequest)
+                .then(response => response.blob())
+                .then(myBlob => {
+                    myImage.src = URL.createObjectURL(myBlob);
+                });
+        }
+
+        document.getElementById("pdfButton").addEventListener("click", function () {
+            let data = {
+                text: "Hello World",
+            };
+
+            fetch("add.php", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+                .then((response) => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    window.location = data.url;
+                    //document.getElementById("result").innerHTML = data
+
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        })
+
+        document.getElementById("oninput").addEventListener("input", function () {
+            let inputData = {
+                inputValue: document.getElementById("oninput").value
+            }
+            fetch("add.php", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputData),
+            })
+                .then(response => response.json()
+                )
+                .then(data => {
+                    console.log('Success:', data);
+                    document.getElementById("result").innerHTML = data
+
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        })
+
+        document.getElementById("getbtn").addEventListener("click", function () {
+            const params = {
+                name: 'John',
+                age: 30,
+                city: 'New York',
+                get: "test"
+            };
+
+            let urlParams = "";
+            for (const [key, value] of Object.entries(params)) {
+                urlParams += (`&${key}=${value}`);
+            }
+            fetch('add.php?' + new URLSearchParams(params)
+           /*  fetch(`add.php?${urlParams}` */, {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json()
+                )
+                .then(data => {
+                    console.log('Success:', data);
+                    document.getElementById("result").innerHTML = data
+
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        })
+
+
+        //Send formdata to server
+
+        document.getElementById("postform").addEventListener("submit", function (e) {
+            post(e, document.getElementById("postform"));
+        })
+
+
+        async function post(e, form) {
+            e.preventDefault();
+            console.log(new FormData(form).toString())
+            //to also send button submitter: e.submitter or hidden input
+            //if (event.submitter) {
+            //data.append(event.submitter.name, event.submitter.value)
+            let data = new FormData(form)
+            data.append(e.submitter.name, e.submitter.value)
+            const response = await fetch(form.action, {
+                method: 'post',
+                body: data //or e.formData
+            });
+
+            document.getElementById("postresponse").innerHTML = await response.text();
+
+
+            console.log('We send post asynchronously (AJAX)');
+
+        }
+
+        document.getElementById("getform").addEventListener("submit", function (e) {
+            get(e, document.getElementById("getform"));
+        })
+
+
+        async function get(e, form) {
+            e.preventDefault();
+            const data = new URLSearchParams(new FormData(form));
+            console.log(data.toString());
+
+            const response = await fetch(`${form.action}?${data}`);
+            document.getElementById("getresponse").innerHTML = await response.text();
+            console.log('We send post asynchronously (AJAX)');
+
+        }
+
+    </script>
+</body>
+
+</html>
