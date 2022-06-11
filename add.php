@@ -76,6 +76,5 @@ if ( isset( $_POST['postsubmit'] ) ) {
 }
 
 if ( isset( $_GET['name'] ) ) {
-	echo 'HEJ' . $_GET['name'];
+	echo 'HEJ ' . $_GET['name'];
 }
-// Test
