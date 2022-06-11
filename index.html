@@ -44,6 +44,11 @@
     <form id="postform" method="post" action="add.php">
         <input type="text" id="postname" name="name" placeholder="Enter your name"><br>
         <input type="text" id="postage" name="age" placeholder="Enter your age"><br>
+        <select title="select" name="select" id="select" multiple>
+            <option value="Test">Test</option>
+            <option value="Test1">Test1</option>
+            <option value="Test2">Test2</option>
+        </select><br>
         <input type="submit" id="postsubmit" name="postsubmit" value="POST">
     </form>
     <p id="postresponse"></p>
@@ -331,6 +336,9 @@
             //if (event.submitter) {
             //data.append(event.submitter.name, event.submitter.value)
             let data = new FormData(form)
+
+            let selectedValues = data.getAll('select')
+            data.append('select', selectedValues)
             data.append(e.submitter.name, e.submitter.value)
             const response = await fetch(form.action, {
                 method: 'post',
@@ -359,6 +367,28 @@
             console.log('We send post asynchronously (AJAX)');
 
         }
+
+        //Formdata as json
+        /*
+            function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const data = new FormData(event.target);
+            const formJSON = Object.fromEntries(data.entries());
+
+            // for multi-selects, we need special handling
+            formJSON.snacks = data.getAll('snacks');
+            formJSON.hej = data.getAll('hej');
+
+            
+            const results = document.querySelector('.results pre');
+            results.innerText = JSON.stringify(formJSON, null, 2);
+            }
+
+            const form = document.querySelector('.contact-form');
+            form.addEventListener('submit', handleFormSubmit);
+
+        */
 
     </script>
 </body>

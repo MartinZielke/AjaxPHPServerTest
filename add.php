@@ -72,7 +72,12 @@ if ( isset( $_GET['city'] ) && ! empty( $_GET ) ) {
 }
 
 if ( isset( $_POST['postsubmit'] ) ) {
-	echo 'HEJ' . $_POST['name'];
+	echo 'HEJ ' . $_POST['name'] . '<br>';
+	echo $_POST['select'] . '<br>';
+
+	// convert to array split on ,
+	print_r( explode( ',', $_POST['select'] ) );
+
 }
 
 if ( isset( $_GET['name'] ) ) {
